@@ -1,39 +1,33 @@
-#!/usr/bin/env python3
 
 import cv2
 import socket
 import struct
 import numpy as np
 
-# connect to WebotsArduVehicle
+# conectando na stream de video.  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("127.0.0.1", 5599))
 
 header_size = struct.calcsize("=HH")
 while True:
-    # receive header
     header = s.recv(header_size)
     if len(header) != header_size:
         print("Header size mismatch")
         break
 
-    # parse header
     width, height = struct.unpack("=HH", header)
 
-    # receive image
     bytes_to_read = width * height * 3  # 3 bytes per pixel for RGB
     img = bytes()
     while len(img) < bytes_to_read:
         img += s.recv(min(bytes_to_read - len(img), 4096))
 
-    # convert incoming bytes to a numpy array (RGB image)
     img = np.frombuffer(img, np.uint8).reshape((height, width, 3))  # 3 channels for RGB
 
-    # Do cool stuff with the image here
-    # For example, display it using OpenCV
+    # Bruxarias digitais podem ser feitas usando o objeto "img" a partir daqui
+    
     cv2.imshow("RGB Image", img)
     
-    # Close window on pressing 'q'
     if cv2.waitKey(1) == ord("q"):
         break
 
